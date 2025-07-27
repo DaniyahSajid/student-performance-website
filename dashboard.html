@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Student Performance Analysis</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* Light background for contrast */
+        }
+
+        header {
+            background-color: navy; /* Header color */
+            color: white;
+            padding: 15px;
+        }
+
+        nav ul {
+            list-style-type: none;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        main {
+            padding: 20px;
+            display: flex; /* Use flexbox for layout */
+            flex-wrap: wrap; /* Allow wrapping of cards */
+            gap: 20px; /* Space between cards */
+        }
+
+        .sticky-note {
+            background-color: #fff; /* White background for notes */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow effect */
+            padding: 15px; /* Padding inside the note */
+            width: calc(30% - 20px); /* Width of each sticky note */
+            min-width: 250px; /* Minimum width for smaller screens */
+        }
+
+        h2 {
+            margin-top: 0; /* Remove top margin for headings */
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Dashboard</h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="student_profile.html">Student Profile</a></li>
+            <li><a href="mentor_parent_profile.html">Mentor/Parent Profile</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+
+    <!-- Sticky Notes for Navigation -->
+    <div class="sticky-note">
+        <h2>Upcoming Tests</h2>
+        <p>Your upcoming tests will be displayed here.</p>
+        <a href="upcoming_tests.html"><button>View Upcoming Tests</button></a> <!-- Link to upcoming tests page -->
+    </div>
+
+    <div class="sticky-note">
+        <h2>Project Deadline Dates</h2>
+        <p>Your project deadlines will be displayed here.</p>
+        <a href="project_deadlines.html"><button>View Project Deadlines</button></a> <!-- Link to project deadlines page -->
+    </div>
+
+    <div class="sticky-note">
+        <h2>Test Results</h2>
+        <p>Your latest test results will be displayed here.</p>
+        <a href="test_results.html"><button>View Test Results</button></a> <!-- Link to test results page -->
+    </div>
+
+    <div class="sticky-note">
+        <h2>Study Schedule</h2>
+        <p>Your study schedule will be organized here.</p>
+        <a href="study_schedule.html"><button>View Study Schedule</button></a> <!-- Link to study schedule page -->
+    </div>
+
+    <div class="sticky-note">
+        <h2>To-Do List</h2>
+        <p>Your tasks will be organized here.</p>
+        <a href="todo_list.html"><button>View To-Do List</button></a> <!-- Link to to-do list page -->
+    </div>
+
+    <!-- Separate Sticky Notes for Homework and Assignment Deadlines -->
+    <div class="sticky-note">
+        <h2>Homework</h2>
+        <p>Your homework assignments will be displayed here.</p>
+        <a href="homework.html"><button>View Homework</button></a> <!-- Link to homework page -->
+    </div>
+
+    <div class="sticky-note">
+        <h2>Assignment Deadlines</h2>
+        <p>Your assignment deadlines will be displayed here.</p>
+        <a href="assignment_deadlines.html"><button>View Assignment Deadlines</button></a> <!-- Link to assignment deadlines page -->
+    </div>
+
+</main>
+
+<footer>
+    <p>&copy; 2024 Student Performance Analysis</p>
+</footer>
+
+</body>
+</html>

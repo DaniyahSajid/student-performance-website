@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Deadline Dates - Student Performance Analysis</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* Light background for contrast */
+        }
+
+        header {
+            background-color: navy; /* Header color */
+            color: white;
+            padding: 15px;
+        }
+
+        nav ul {
+            list-style-type: none;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Collapse borders for cleaner look */
+            margin-top: 20px; /* Space above the table */
+        }
+
+        th, td {
+            border: 1px solid #ccc; /* Border for table cells */
+            padding: 10px; /* Padding inside table cells */
+            text-align: left; /* Align text to the left */
+        }
+
+        th {
+            background-color: #f2f2f2; /* Light gray background for headers */
+        }
+
+        .completed {
+            text-decoration: line-through; /* Strikethrough for completed projects */
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Project Deadline Dates</h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="student_profile.html">Student Profile</a></li>
+            <li><a href="mentor_parent_profile.html">Mentor/Parent Profile</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+
+    <h2>Add Details</h2> <!-- Updated heading -->
+    <form id="projectForm">
+        <input type="date" id="deadlineDate" required placeholder="Deadline Date">
+        <input type="text" id="subject" required placeholder="Subject">
+        <input type="text" id="projectTitle" required placeholder="Project Title">
+        <button type="submit">Add Details</button> <!-- Changed button text to "Add Details" -->
+    </form>
+
+    <!-- Table to display project deadlines -->
+    <table id="projectTable">
+        <thead>
+            <tr>
+                <th>Completed</th>
+                <th>Deadline Date</th>
+                <th>Subject</th>
+                <th>Project Title</th>
+            </tr>
+        </thead>
+        <tbody id="projectBody">
+            <!-- Project entries will be added here dynamically -->
+        </tbody>
+    </table>
+
+</main>
+
+<footer>
+    <p>&copy; 2024 Student Performance Analysis</p>
+</footer>
+
+<script>
+// Function to load projects from localStorage
+function loadProjects() {
+    const projects = JSON.parse(localStorage.getItem('projectDeadlines')) || [];
+    projects.forEach(project => addProjectToTable(project.deadlineDate, project.subject, project.projectTitle, project.completed));
+}
+
+// Function to add a new project to the table
+document.getElementById('projectForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent form submission
+
+    // Get input values
+    const deadlineDate = document.getElementById('deadlineDate').value;
+    const subject = document.getElementById('subject').value;
+    const projectTitle = document.getElementById('projectTitle').value;
+
+    // Add project to localStorage
+    const projects = JSON.parse(localStorage.getItem('projectDeadlines')) || [];
+    projects.push({ deadlineDate, subject, projectTitle, completed: false });
+    localStorage.setItem('projectDeadlines', JSON.stringify(projects));
+
+    // Add project to table
+    addProjectToTable(deadlineDate, subject, projectTitle);
+
+    // Clear the input fields after adding the project
+    document.getElementById('projectForm').reset();
+});
+
+// Function to add a project row to the table
+function addProjectToTable(deadlineDate, subject, projectTitle, completed = false) {
+    const newRow = document.createElement('tr');
+
+    // Create checkbox for completion
+    const completedCell = document.createElement('td');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    
+    // Set checkbox state based on completion status
+    checkbox.checked = completed;
+    
+    // Add event listener to checkbox
+    checkbox.addEventListener('change', function() {
+        if (this.checked) {
+            newRow.classList.add('completed'); // Add class to strike through
+            updateProjectCompletion(deadlineDate, subject, projectTitle, true); // Update local storage
+        } else {
+            newRow.classList.remove('completed'); // Remove class if unchecked
+            updateProjectCompletion(deadlineDate, subject, projectTitle, false); // Update local storage
+        }
+    });
+
+    completedCell.appendChild(checkbox);
+    
+    // Create cells for deadline date, subject, and title
+    const dateCell = document.createElement('td');
+    dateCell.textContent = deadlineDate;
+
+    const subjectCell = document.createElement('td');
+    subjectCell.textContent = subject;
+
+    const titleCell = document.createElement('td');
+    titleCell.textContent = projectTitle;
+
+   // Append cells to the new row
+   newRow.appendChild(completedCell);
+   newRow.appendChild(dateCell);
+   newRow.appendChild(subjectCell);
+   newRow.appendChild(titleCell);
+
+   // Append the new row to the table body
+   document.getElementById('projectBody').appendChild(newRow);
+
+   // Mark as completed if already checked
+   if (completed) {
+       newRow.classList.add('completed');
+   }
+}
+
+// Function to update completion status in localStorage
+function updateProjectCompletion(deadlineDate, subject, projectTitle, completed) {
+   let projects = JSON.parse(localStorage.getItem('projectDeadlines')) || [];
+   projects.forEach(project => {
+       if (project.deadlineDate === deadlineDate && 
+           project.subject === subject && 
+           project.projectTitle === projectTitle) {
+           project.completed = completed; // Update completion status
+       }
+   });
+   localStorage.setItem('projectDeadlines', JSON.stringify(projects));
+}
+
+// Load projects when the page loads
+window.onload = loadProjects;
+
+</script>
+
+</body>
+</html>

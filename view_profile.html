@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Student Profile - Student Performance Analysis</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+</head>
+<body>
+
+<header>
+    <h1>View Student Profile</h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="student_profile.html">Student Profile</a></li>
+            <li><a href="mentor_profile.html">Mentor Profile</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <h2>Saved Profile Information</h2>
+
+    <div id="savedProfileInfo"></div>
+
+    <button id="backButton">Back to Student Profile</button>
+</main>
+
+<footer>
+    <p>&copy; 2024 Student Performance Analysis</p>
+</footer>
+
+<script>
+// Function to display saved profile information
+function displaySavedProfile() {
+    const savedData = JSON.parse(localStorage.getItem('studentProfile'));
+    
+    if (savedData) {
+        const savedProfileDiv = document.getElementById('savedProfileInfo');
+        savedProfileDiv.innerHTML = `
+            <p><strong>Name:</strong> ${savedData.studentName}</p>
+            <p><strong>Age:</strong> ${savedData.age}</p>
+            <p><strong>Class:</strong> ${savedData.class}</p>
+            <p><strong>Goals:</strong> ${savedData.goals.join(', ')}</p>
+        `;
+    } else {
+        document.getElementById('savedProfileInfo').innerHTML = '<p>No profile information found.</p>';
+    }
+}
+
+// Load saved profile data on page load
+window.onload = function() {
+    displaySavedProfile();
+};
+
+// Back button functionality
+document.getElementById('backButton').addEventListener('click', function() {
+    window.location.href = 'student_profile.html'; // Redirect back to the student profile page
+});
+</script>
+
+</body>
+</html>

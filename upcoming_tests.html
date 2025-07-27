@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Tests - Student Performance Analysis</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* Light background for contrast */
+        }
+
+        header {
+            background-color: navy; /* Header color */
+            color: white;
+            padding: 15px;
+        }
+
+        nav ul {
+            list-style-type: none;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Collapse borders for cleaner look */
+            margin-top: 20px; /* Space above the table */
+        }
+
+        th, td {
+            border: 1px solid #ccc; /* Border for table cells */
+            padding: 10px; /* Padding inside table cells */
+            text-align: left; /* Align text to the left */
+        }
+
+        th {
+            background-color: #f2f2f2; /* Light gray background for headers */
+        }
+
+        .completed {
+            text-decoration: line-through; /* Strikethrough for completed tests */
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Upcoming Tests</h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="student_profile.html">Student Profile</a></li>
+            <li><a href="mentor_parent_profile.html">Mentor/Parent Profile</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+
+    <h2>Add Upcoming Test</h2>
+    <form id="testForm">
+        <input type="date" id="testDate" required placeholder="Test Date">
+        <input type="text" id="subject" required placeholder="Subject">
+        <input type="text" id="topic" required placeholder="Topic">
+        <button type="submit">Add Test</button>
+    </form>
+
+    <!-- Table to display upcoming tests -->
+    <table id="testTable">
+        <thead>
+            <tr>
+                <th>Completed</th>
+                <th>Date</th>
+                <th>Subject</th>
+                <th>Topic</th>
+            </tr>
+        </thead>
+        <tbody id="testBody">
+            <!-- Test entries will be added here dynamically -->
+        </tbody>
+    </table>
+
+</main>
+
+<footer>
+    <p>&copy; 2024 Student Performance Analysis</p>
+</footer>
+
+<script>
+// Function to load tests from localStorage
+function loadTests() {
+    const tests = JSON.parse(localStorage.getItem('upcomingTests')) || [];
+    tests.forEach(test => addTestToTable(test.date, test.subject, test.topic, test.completed));
+}
+
+// Function to add a new test to the table
+document.getElementById('testForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent form submission
+
+    // Get input values
+    const date = document.getElementById('testDate').value;
+    const subject = document.getElementById('subject').value;
+    const topic = document.getElementById('topic').value;
+
+    // Add test to localStorage
+    const tests = JSON.parse(localStorage.getItem('upcomingTests')) || [];
+    tests.push({ date, subject, topic, completed: false });
+    localStorage.setItem('upcomingTests', JSON.stringify(tests));
+
+    // Add test to table
+    addTestToTable(date, subject, topic);
+
+    // Clear the input fields after adding the test
+    document.getElementById('testForm').reset();
+});
+
+// Function to add a test row to the table
+function addTestToTable(date, subject, topic, completed = false) {
+    const newRow = document.createElement('tr');
+
+    // Create checkbox for completion
+    const completedCell = document.createElement('td');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    
+    // Set checkbox state based on completion status
+    checkbox.checked = completed;
+    
+    // Add event listener to checkbox
+    checkbox.addEventListener('change', function() {
+        if (this.checked) {
+            newRow.classList.add('completed'); // Add class to strike through
+            updateTestCompletion(date, subject, topic, true); // Update local storage
+        } else {
+            newRow.classList.remove('completed'); // Remove class if unchecked
+            updateTestCompletion(date, subject, topic, false); // Update local storage
+        }
+    });
+
+    completedCell.appendChild(checkbox);
+    
+    // Create cells for date, subject, and topic
+    const dateCell = document.createElement('td');
+    dateCell.textContent = date;
+
+    const subjectCell = document.createElement('td');
+    subjectCell.textContent = subject;
+
+    const topicCell = document.createElement('td');
+    topicCell.textContent = topic;
+
+    // Append cells to the new row
+    newRow.appendChild(completedCell);
+    newRow.appendChild(dateCell);
+    newRow.appendChild(subjectCell);
+    newRow.appendChild(topicCell);
+
+    // Append the new row to the table body
+    document.getElementById('testBody').appendChild(newRow);
+
+   // Mark as completed if already checked
+   if (completed) {
+       newRow.classList.add('completed');
+   }
+}
+
+// Function to update completion status in localStorage
+function updateTestCompletion(date, subject, topic, completed) {
+   let tests = JSON.parse(localStorage.getItem('upcomingTests')) || [];
+   tests.forEach(test => {
+       if (test.date === date && test.subject === subject && test.topic === topic) {
+           test.completed = completed; // Update completion status
+       }
+   });
+   localStorage.setItem('upcomingTests', JSON.stringify(tests));
+}
+
+// Load tests when the page loads
+window.onload = loadTests;
+
+</script>
+
+</body>
+</html>

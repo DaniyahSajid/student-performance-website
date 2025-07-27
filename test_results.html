@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Results - Student Performance Analysis</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* Light background for contrast */
+        }
+
+        header {
+            background-color: navy; /* Header color */
+            color: white;
+            padding: 15px;
+        }
+
+        nav ul {
+            list-style-type: none;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Collapse borders for cleaner look */
+            margin-top: 20px; /* Space above the table */
+        }
+
+        th, td {
+            border: 1px solid #ccc; /* Border for table cells */
+            padding: 10px; /* Padding inside table cells */
+            text-align: left; /* Align text to the left */
+        }
+
+        th {
+            background-color: #f2f2f2; /* Light gray background for headers */
+        }
+
+        .delete-button {
+            color: red;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Test Results</h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="student_profile.html">Student Profile</a></li>
+            <li><a href="mentor_parent_profile.html">Mentor/Parent Profile</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+
+    <h2>Add Test Result</h2> <!-- Updated heading -->
+    <form id="resultForm">
+        <input type="text" id="subject" required placeholder="Subject Name">
+        <input type="text" id="unitNumber" required placeholder="Unit Number">
+        <input type="number" id="maxMarks" required placeholder="Max Marks">
+        <input type="number" id="marksObtained" required placeholder="Marks Obtained">
+        <input type="text" id="grade" required placeholder="Grade">
+        <button type="submit">Add Result</button> <!-- Button to add result -->
+    </form>
+
+    <!-- Table to display test results -->
+    <table id="resultsTable">
+        <thead>
+            <tr>
+                <th>Subject Name</th>
+                <th>Unit Number</th>
+                <th>Max Marks</th>
+                <th>Marks Obtained</th>
+                <th>Grade</th>
+                <th>Action</th> <!-- Column for delete action -->
+            </tr>
+        </thead>
+        <tbody id="resultsBody">
+            <!-- Test entries will be added here dynamically -->
+        </tbody>
+    </table>
+
+</main>
+
+<footer>
+    <p>&copy; 2024 Student Performance Analysis</p>
+</footer>
+
+<script>
+// Function to load results from localStorage
+function loadResults() {
+    const results = JSON.parse(localStorage.getItem('testResults')) || [];
+    results.forEach(result => addResultToTable(result.subject, result.unitNumber, result.maxMarks, result.marksObtained, result.grade));
+}
+
+// Function to add a new result to the table
+document.getElementById('resultForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent form submission
+
+    // Get input values
+    const subject = document.getElementById('subject').value;
+    const unitNumber = document.getElementById('unitNumber').value;
+    const maxMarks = document.getElementById('maxMarks').value;
+    const marksObtained = document.getElementById('marksObtained').value;
+    const grade = document.getElementById('grade').value;
+
+    // Add result to localStorage
+    const results = JSON.parse(localStorage.getItem('testResults')) || [];
+    results.push({ subject, unitNumber, maxMarks, marksObtained, grade });
+    localStorage.setItem('testResults', JSON.stringify(results));
+
+    // Add result to table
+    addResultToTable(subject, unitNumber, maxMarks, marksObtained, grade);
+
+    // Clear the input fields after adding the result
+    document.getElementById('resultForm').reset();
+});
+
+// Function to add a result row to the table
+function addResultToTable(subject, unitNumber, maxMarks, marksObtained, grade) {
+    const newRow = document.createElement('tr');
+
+    // Create cells for subject name, unit number, max marks, marks obtained and grade
+    const subjectCell = document.createElement('td');
+    subjectCell.textContent = subject;
+
+    const unitCell = document.createElement('td');
+    unitCell.textContent = unitNumber;
+
+    const maxMarksCell = document.createElement('td');
+    maxMarksCell.textContent = maxMarks;
+
+    const obtainedMarksCell = document.createElement('td');
+    obtainedMarksCell.textContent = marksObtained;
+
+    const gradeCell = document.createElement('td');
+    gradeCell.textContent = grade;
+
+   // Create delete button
+   const actionCell = document.createElement('td');
+   const deleteButton = document.createElement('span');
+   deleteButton.textContent = 'Delete';
+   deleteButton.classList.add('delete-button');
+   deleteButton.addEventListener('click', function() {
+       newRow.remove(); // Remove row from the table
+       deleteResult(subject); // Remove from localStorage
+   });
+
+   actionCell.appendChild(deleteButton);
+
+   // Append cells to the new row
+   newRow.appendChild(subjectCell);
+   newRow.appendChild(unitCell);
+   newRow.appendChild(maxMarksCell);
+   newRow.appendChild(obtainedMarksCell);
+   newRow.appendChild(gradeCell);
+   newRow.appendChild(actionCell);
+
+   // Append the new row to the table body
+   document.getElementById('resultsBody').appendChild(newRow);
+}
+
+// Function to remove a result from localStorage
+function deleteResult(subject) {
+   let results = JSON.parse(localStorage.getItem('testResults')) || [];
+   results = results.filter(result => result.subject !== subject); // Filter out the deleted subject
+   localStorage.setItem('testResults', JSON.stringify(results)); // Update localStorage
+}
+
+// Load results when the page loads
+window.onload = loadResults;
+
+</script>
+
+</body>
+</html>

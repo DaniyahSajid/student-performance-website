@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Schedule - Student Performance Analysis</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* Light background for contrast */
+        }
+
+        header {
+            background-color: navy; /* Header color */
+            color: white;
+            padding: 15px;
+        }
+
+        nav ul {
+            list-style-type: none;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Collapse borders for cleaner look */
+            margin-top: 20px; /* Space above the table */
+        }
+
+        th, td {
+            border: 1px solid #ccc; /* Border for table cells */
+            padding: 10px; /* Padding inside table cells */
+            text-align: left; /* Align text to the left */
+        }
+
+        th {
+            background-color: #f2f2f2; /* Light gray background for headers */
+        }
+
+        .delete-button {
+            color: red;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Study Schedule</h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="student_profile.html">Student Profile</a></li>
+            <li><a href="mentor_parent_profile.html">Mentor/Parent Profile</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+
+    <h2>Edit Your Study Schedule</h2> <!-- Heading -->
+    
+    <!-- Table to display study schedule -->
+    <table id="scheduleTable">
+        <thead>
+            <tr id="headerRow">
+                <th>Subject / Time</th>
+                <th>Monday</th>
+                <th>Tuesday</th>
+                <th>Wednesday</th>
+                <th>Thursday</th>
+                <th>Friday</th>
+                <th>Saturday</th>
+                <th>Sunday</th>
+                <th>Action</th> <!-- Column for delete action -->
+            </tr>
+        </thead>
+        <tbody id="scheduleBody">
+            <!-- Schedule entries will be added here dynamically -->
+        </tbody>
+    </table>
+
+    <!-- Buttons to add rows and columns -->
+    <button id="addRow">Add Subject</button>
+    <button id="addColumn">Add Day</button>
+    <button id="saveSchedule">Save Schedule</button>
+
+</main>
+
+<footer>
+    <p>&copy; 2024 Student Performance Analysis</p>
+</footer>
+
+<script>
+// Define initial days of the week
+const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+// Load schedule from localStorage
+function loadSchedule() {
+    const schedule = JSON.parse(localStorage.getItem('studySchedule')) || {};
+    
+    Object.keys(schedule).forEach(subject => {
+        const row = document.createElement('tr');
+        
+        // Create first cell for subject name
+        const subjectCell = document.createElement('td');
+        subjectCell.textContent = subject;
+        
+        row.appendChild(subjectCell);
+
+        // Create cells for each day of the week
+        daysOfWeek.forEach((day, index) => {
+            const cell = document.createElement('td');
+            
+            // Create an input field
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = (schedule[subject] && schedule[subject][index]) ? schedule[subject][index] : ''; // Load existing data
+            
+            cell.appendChild(input);
+            row.appendChild(cell);
+        });
+
+        // Add delete button
+        const actionCell = document.createElement('td');
+        const deleteButton = document.createElement('span');
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList.add('delete-button');
+        
+        deleteButton.addEventListener('click', function() {
+            row.remove(); // Remove row from the table
+            delete schedule[subject]; // Remove from schedule object
+            localStorage.setItem('studySchedule', JSON.stringify(schedule)); // Update localStorage
+        });
+
+        actionCell.appendChild(deleteButton);
+        row.appendChild(actionCell);
+
+        document.getElementById('scheduleBody').appendChild(row);
+    });
+}
+
+// Function to add a new row (subject) to the table
+document.getElementById('addRow').addEventListener('click', function() {
+    const newSubject = prompt("Enter the subject name:");
+    
+    if (newSubject) {
+        const row = document.createElement('tr');
+
+        // Create first cell for subject name
+        const subjectCell = document.createElement('td');
+        subjectCell.textContent = newSubject;
+        
+        row.appendChild(subjectCell);
+
+        // Create cells for each day of the week with empty inputs
+        daysOfWeek.forEach(() => {
+            const cell = document.createElement('td');
+            
+            // Create an input field
+            const input = document.createElement('input');
+            input.type = 'text';
+            
+            cell.appendChild(input);
+            row.appendChild(cell);
+        });
+
+       // Add delete button
+       const actionCell = document.createElement('td');
+       const deleteButton = document.createElement('span');
+       deleteButton.textContent = 'Delete';
+       deleteButton.classList.add('delete-button');
+
+       deleteButton.addEventListener('click', function() {
+           row.remove(); // Remove row from the table
+           updateLocalStorage(); // Update local storage after deletion
+       });
+
+       actionCell.appendChild(deleteButton);
+       row.appendChild(actionCell);
+
+       document.getElementById('scheduleBody').appendChild(row);
+       
+       updateLocalStorage(); // Update local storage after adding a new subject
+   }
+});
+
+// Function to add a new column (day) to the table
+document.getElementById('addColumn').addEventListener('click', function() {
+   const newDay = prompt("Enter the name of the new day:");
+   
+   if (newDay) {
+       daysOfWeek.push(newDay); // Add new day to the array
+
+       // Update header row with new day column
+       const headerRow = document.getElementById('headerRow');
+       const newHeaderCell = document.createElement('th');
+       newHeaderCell.textContent = newDay;
+       headerRow.appendChild(newHeaderCell);
+
+       // Update each existing row with an empty cell for the new day
+       const rows = document.querySelectorAll('#scheduleBody tr');
+       rows.forEach(row => {
+           const newCell = document.createElement('td');
+           const inputField = document.createElement('input');
+           inputField.type = 'text';
+           newCell.appendChild(inputField);
+           row.appendChild(newCell);
+       });
+       
+       updateLocalStorage(); // Update local storage after adding a new column
+   }
+});
+
+// Function to save schedule to localStorage
+document.getElementById('saveSchedule').addEventListener('click', function() {
+   const schedule = {};
+
+   // Loop through each subject and gather data from inputs
+   const rows = document.querySelectorAll('#scheduleTable tbody tr');
+
+   rows.forEach((row, index) => {
+       const subjectName = row.cells[0].textContent; // Get subject name
+
+       if (!schedule[subjectName]) {
+           schedule[subjectName] = [];
+       }
+
+       for (let i = 1; i < row.cells.length - 1; i++) { // Exclude last cell (action cell)
+           const inputValue = row.cells[i].querySelector('input').value; // Get input value
+           schedule[subjectName][i - 1] = inputValue; // Save value in corresponding index
+       }
+   });
+
+   localStorage.setItem('studySchedule', JSON.stringify(schedule));
+   alert("Schedule saved successfully!"); // Confirmation message
+});
+
+// Function to update local storage after changes in the table
+function updateLocalStorage() {
+   const scheduleData = {};
+   const rows = document.querySelectorAll('#scheduleTable tbody tr');
+
+   rows.forEach(row => {
+       const subjectName = row.cells[0].textContent;
+       
+       if (!scheduleData[subjectName]) {
+           scheduleData[subjectName] = [];
+       }
+
+       for (let i = 1; i < row.cells.length - 1; i++) { // Exclude last cell (action cell)
+           const inputValue = row.cells[i].querySelector('input').value;
+           scheduleData[subjectName][i - 1] = inputValue;
+       }
+   });
+
+   localStorage.setItem('studySchedule', JSON.stringify(scheduleData));
+}
+
+// Load schedule when the page loads
+window.onload = loadSchedule;
+
+</script>
+
+</body>
+</html>

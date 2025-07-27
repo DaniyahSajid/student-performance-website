@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Deadlines - Student Performance Analysis</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* Light background for contrast */
+        }
+
+        header {
+            background-color: navy; /* Header color */
+            color: white;
+            padding: 15px;
+        }
+
+        nav ul {
+            list-style-type: none;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Collapse borders for cleaner look */
+            margin-top: 20px; /* Space above the table */
+        }
+
+        th, td {
+            border: 1px solid #ccc; /* Border for table cells */
+            padding: 10px; /* Padding inside table cells */
+            text-align: left; /* Align text to the left */
+        }
+
+        th {
+            background-color: #f2f2f2; /* Light gray background for headers */
+        }
+
+        .completed {
+            text-decoration: line-through; /* Strikethrough for completed assignments */
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Assignment Deadlines</h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="student_profile.html">Student Profile</a></li>
+            <li><a href="mentor_parent_profile.html">Mentor/Parent Profile</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+
+    <h2>Add Details</h2> <!-- Updated heading -->
+    <form id="assignmentForm">
+        <input type="date" id="deadlineDate" required placeholder="Deadline Date">
+        <input type="text" id="subject" required placeholder="Subject">
+        <input type="text" id="assignmentTitle" required placeholder="Assignment Title">
+        <button type="submit">Add Details</button> <!-- Button text remains unchanged -->
+    </form>
+
+    <!-- Table to display assignment deadlines -->
+    <table id="assignmentTable">
+        <thead>
+            <tr>
+                <th>Completed</th>
+                <th>Deadline Date</th>
+                <th>Subject</th>
+                <th>Assignment Title</th>
+            </tr>
+        </thead>
+        <tbody id="assignmentBody">
+            <!-- Assignment entries will be added here dynamically -->
+        </tbody>
+    </table>
+
+</main>
+
+<footer>
+    <p>&copy; 2024 Student Performance Analysis</p>
+</footer>
+
+<script>
+// Function to load assignments from localStorage
+function loadAssignments() {
+    const assignments = JSON.parse(localStorage.getItem('assignmentDeadlines')) || [];
+    assignments.forEach(assignment => addAssignmentToTable(assignment.deadlineDate, assignment.subject, assignment.assignmentTitle, assignment.completed));
+}
+
+// Function to add a new assignment to the table
+document.getElementById('assignmentForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent form submission
+
+    // Get input values
+    const deadlineDate = document.getElementById('deadlineDate').value;
+    const subject = document.getElementById('subject').value;
+    const assignmentTitle = document.getElementById('assignmentTitle').value;
+
+    // Add assignment to localStorage
+    const assignments = JSON.parse(localStorage.getItem('assignmentDeadlines')) || [];
+    assignments.push({ deadlineDate, subject, assignmentTitle, completed: false });
+    localStorage.setItem('assignmentDeadlines', JSON.stringify(assignments));
+
+    // Add assignment to table
+    addAssignmentToTable(deadlineDate, subject, assignmentTitle);
+
+    // Clear the input fields after adding the assignment
+    document.getElementById('assignmentForm').reset();
+});
+
+// Function to add an assignment row to the table
+function addAssignmentToTable(deadlineDate, subject, assignmentTitle, completed = false) {
+    const newRow = document.createElement('tr');
+
+    // Create checkbox for completion
+    const completedCell = document.createElement('td');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    
+    // Set checkbox state based on completion status
+    checkbox.checked = completed;
+    
+    // Add event listener to checkbox
+    checkbox.addEventListener('change', function() {
+        if (this.checked) {
+            newRow.classList.add('completed'); // Add class to strike through
+            updateAssignmentCompletion(deadlineDate, subject, assignmentTitle, true); // Update local storage
+        } else {
+            newRow.classList.remove('completed'); // Remove class if unchecked
+            updateAssignmentCompletion(deadlineDate, subject, assignmentTitle, false); // Update local storage
+        }
+        
+        // Check if all assignments are completed and remove row if so
+        if (completedCell.parentNode.querySelectorAll('.completed').length === newRow.parentNode.children.length) {
+            newRow.remove(); // Remove entire row if all tasks are done
+        }
+    });
+
+    completedCell.appendChild(checkbox);
+    
+    // Create cells for deadline date, subject, and title
+    const dateCell = document.createElement('td');
+    dateCell.textContent = deadlineDate;
+
+    const subjectCell = document.createElement('td');
+    subjectCell.textContent = subject;
+
+    const titleCell = document.createElement('td');
+    titleCell.textContent = assignmentTitle;
+
+   // Append cells to the new row
+   newRow.appendChild(completedCell);
+   newRow.appendChild(dateCell);
+   newRow.appendChild(subjectCell);
+   newRow.appendChild(titleCell);
+
+   // Append the new row to the table body
+   document.getElementById('assignmentBody').appendChild(newRow);
+
+   // Mark as completed if already checked
+   if (completed) {
+       newRow.classList.add('completed');
+   }
+}
+
+// Function to update completion status in localStorage
+function updateAssignmentCompletion(deadlineDate, subject, assignmentTitle, completed) {
+   let assignments = JSON.parse(localStorage.getItem('assignmentDeadlines')) || [];
+   assignments.forEach(assignment => {
+       if (assignment.deadlineDate === deadlineDate && 
+           assignment.subject === subject && 
+           assignment.assignmentTitle === assignmentTitle) {
+           assignment.completed = completed; // Update completion status
+       }
+   });
+   localStorage.setItem('assignmentDeadlines', JSON.stringify(assignments));
+}
+
+// Load assignments when the page loads
+window.onload = loadAssignments;
+
+</script>
+
+</body>
+</html>

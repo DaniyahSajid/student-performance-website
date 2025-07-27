@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile - Student Performance Analysis</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background-color: navy;
+            color: white;
+            padding: 15px;
+        }
+
+        nav ul {
+            list-style-type: none;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        section {
+            margin-bottom: 30px;
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .edit-button {
+            float: right;
+            background-color: navy;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .edit-button:hover {
+            background-color: #0056b3;
+        }
+
+        input[type=text], input[type=number], input[type=email], input[type=tel] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 10px; 
+        }
+
+        label {
+            font-weight: bold; 
+        }
+
+        #student-info {
+            margin-bottom: 30px;
+            border-radius: 5px;
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+        }
+        
+        button {
+            margin-top: 10px; 
+        }
+        
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Student Profile</h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="mentor_parent_profile.html">Mentor/Parent Profile</a></li> <!-- Updated link -->
+        </ul>
+    </nav>
+</header>
+
+<main>
+
+    <!-- Student Section -->
+    <section id="student-info">
+        <h2>Student Information</h2>
+        <button class="edit-button" onclick="toggleEdit('student')">Edit</button>
+
+        <label for="studentName">Name:</label>
+        <input type="text" id="studentName" placeholder="Enter student name" disabled />
+
+        <label for="studentAge">Age:</label>
+        <input type="number" id="studentAge" placeholder="Enter student age" disabled />
+
+        <label for="studentClass">Class:</label>
+        <input type="text" id="studentClass" placeholder="Enter student class" disabled />
+
+        <label for="studentContact">Contact Number:</label>
+        <input type="tel" id="studentContact" placeholder="Enter student contact number" disabled />
+        
+    </section>
+
+    <!-- Save Button -->
+    <button id="saveProfileBtn">Save Information</button>
+
+</main>
+
+<footer>
+    <p>&copy; 2024 Student Performance Analysis</p>
+</footer>
+
+<script>
+// Function to toggle edit mode
+function toggleEdit(section) {
+    const inputs = document.querySelectorAll(`#${section}-info input`);
+    inputs.forEach(input => input.disabled = !input.disabled);
+    
+    const saveButton = document.getElementById('saveProfileBtn');
+    saveButton.style.display = 'inline-block';
+}
+
+// Function to save profile information
+document.getElementById('saveProfileBtn').addEventListener('click', function() {
+    const studentData = {
+      name: document.getElementById('studentName').value,
+      age: document.getElementById('studentAge').value,
+      classValue: document.getElementById('studentClass').value,
+      contact: document.getElementById('studentContact').value
+    };
+
+    localStorage.setItem('studentProfile', JSON.stringify(studentData));
+
+    // Disable inputs after saving
+    toggleEdit('student');
+});
+
+// Load saved profile data on page load
+window.onload = function() {
+    const savedStudentData = JSON.parse(localStorage.getItem('studentProfile'));
+
+    if (savedStudentData) {
+      document.getElementById('studentName').value = savedStudentData.name || '';
+      document.getElementById('studentAge').value = savedStudentData.age || '';
+      document.getElementById('studentClass').value = savedStudentData.classValue || '';
+      document.getElementById('studentContact').value = savedStudentData.contact || '';
+    }
+};
+</script>
+
+</body>
+</html>

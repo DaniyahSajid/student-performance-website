@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homework - Student Performance Analysis</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* Light background for contrast */
+        }
+
+        header {
+            background-color: navy; /* Header color */
+            color: white;
+            padding: 15px;
+        }
+
+        nav ul {
+            list-style-type: none;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .sticky-note {
+            background-color: #fff; /* White background for notes */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow effect */
+            padding: 15px; /* Padding inside the note */
+            width: calc(30% - 20px); /* Width of each sticky note */
+            min-width: 250px; /* Minimum width for smaller screens */
+            margin: 10px; /* Space between notes */
+            display: inline-block; /* Allow sticky notes to sit next to each other */
+        }
+
+        .delete-button {
+            color: red;
+            cursor: pointer;
+        }
+
+        .add-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%; /* Circle shape */
+            background-color: navy; /* Navy blue background */
+            color: white; /* White text color */
+            border: none; /* No border */
+            font-size: 24px; /* Font size for the plus sign */
+            cursor: pointer; /* Pointer cursor on hover */
+        }
+
+        .task-input {
+            display: none; /* Hidden by default */
+            margin-top: 10px; /* Space above input field */
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Homework</h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="student_profile.html">Student Profile</a></li>
+            <li><a href="mentor_parent_profile.html">Mentor/Parent Profile</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+
+    <h2>Your Homework</h2> <!-- Heading -->
+    
+    <!-- Container for sticky notes -->
+    <div id="stickyNotesContainer"></div>
+
+    <!-- Input field for adding new subject -->
+    <input type="text" id="subjectInput" class="task-input" placeholder="Enter subject name...">
+    
+    <!-- Add Subject Button -->
+    <button class="add-button" id="addSubjectButton">+</button>
+
+</main>
+
+<footer>
+    <p>&copy; 2024 Student Performance Analysis</p>
+</footer>
+
+<script>
+// Function to load subjects from localStorage
+function loadSubjects() {
+    const subjects = JSON.parse(localStorage.getItem('homeworkSubjects')) || [];
+    subjects.forEach(subject => addSubjectToStickyNote(subject));
+}
+
+// Function to add a new subject (sticky note)
+document.getElementById('addSubjectButton').addEventListener('click', function() {
+    const subjectInput = document.getElementById('subjectInput');
+    
+    // Show input field if hidden
+    if (subjectInput.style.display === 'none' || subjectInput.style.display === '') {
+        subjectInput.style.display = 'block';
+        subjectInput.focus(); // Focus on input field
+    } else {
+        const subjectText = subjectInput.value.trim();
+        
+        if (subjectText) {
+            // Save subject to localStorage
+            const subjects = JSON.parse(localStorage.getItem('homeworkSubjects')) || [];
+            subjects.push({ name: subjectText, tasks: [] });
+            localStorage.setItem('homeworkSubjects', JSON.stringify(subjects));
+
+            // Add subject to the sticky note container
+            addSubjectToStickyNote({ name: subjectText, tasks: [] });
+            
+            // Clear input field and hide it
+            subjectInput.value = '';
+            subjectInput.style.display = 'none';
+        }
+    }
+});
+
+// Function to add a new sticky note for a subject
+function addSubjectToStickyNote(subject) {
+    const stickyNote = document.createElement('div');
+    stickyNote.className = 'sticky-note';
+
+    const titleNode = document.createElement('h3');
+    titleNode.textContent = subject.name;
+
+    const taskList = document.createElement('ul');
+
+    // Add task input field
+    const taskInput = document.createElement('input');
+    taskInput.type = 'text';
+    taskInput.placeholder = "Enter homework...";
+    
+    const addTaskButton = document.createElement('button');
+    addTaskButton.textContent = "Add Task";
+    
+    addTaskButton.addEventListener('click', function() {
+        const taskText = taskInput.value.trim();
+        
+        if (taskText) {
+            // Save task in localStorage
+            const subjects = JSON.parse(localStorage.getItem('homeworkSubjects')) || [];
+            
+           // Find the correct subject and add the task
+           const updatedSubjects = subjects.map(subj => {
+               if (subj.name === subject.name) {
+                   subj.tasks.push(taskText);
+               }
+               return subj;
+           });
+
+           localStorage.setItem('homeworkSubjects', JSON.stringify(updatedSubjects));
+
+           // Add task to the list
+           addTaskToList(taskList, taskText);
+           
+           // Clear input field after adding the task
+           taskInput.value = '';
+       }
+   });
+
+   stickyNote.appendChild(titleNode);
+   stickyNote.appendChild(taskInput);
+   stickyNote.appendChild(addTaskButton);
+   stickyNote.appendChild(taskList);
+
+   document.getElementById('stickyNotesContainer').appendChild(stickyNote);
+}
+
+// Function to add a task to the list within a sticky note
+function addTaskToList(taskList, taskText) {
+   const listItem = document.createElement('li');
+   listItem.textContent = taskText;
+
+   // Create checkbox for completion
+   const checkbox = document.createElement('input');
+   checkbox.type = 'checkbox';
+
+   checkbox.addEventListener('change', function() {
+       if (this.checked) {
+           listItem.remove(); // Remove item from the list
+           updateLocalStorage(); // Update local storage after deletion
+
+           // Check if the sticky note is empty and remove it if so
+           if (taskList.children.length === 0) {
+               taskList.parentNode.remove(); // Remove entire sticky note
+               deleteSubjectFromLocalStorage(taskList.parentNode.firstChild.textContent); // Remove from local storage
+           }
+       }
+   });
+
+   listItem.prepend(checkbox); // Add checkbox before text
+
+   taskList.appendChild(listItem);
+}
+
+// Function to delete a subject from localStorage when its sticky note is removed
+function deleteSubjectFromLocalStorage(subjectName) {
+   let subjects = JSON.parse(localStorage.getItem('homeworkSubjects')) || [];
+   subjects = subjects.filter(subj => subj.name !== subjectName); // Filter out the deleted subject
+   localStorage.setItem('homeworkSubjects', JSON.stringify(subjects)); // Update localStorage
+}
+
+// Load subjects when the page loads
+window.onload = loadSubjects;
+
+</script>
+
+</body>
+</html>
